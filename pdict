@@ -1,0 +1,138 @@
+#!/usr/bin/env php 
+<?php 
+check_runtime_environment($argc);
+check_network_connection();
+do {
+	printf(">");
+	$api_url = 'http://aidemo.youdao.com/trans';
+	$request_method = 'POST';
+	$fp = @fopen("php://stdin", "r");
+	$post_data = sprintf('q=%s&from=Auto&to=Auto', trim(fgets($fp)));
+	$headers = [
+		'X-Requested-With: XMLHttpRequest',
+		'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+	];
+	$opts = [
+		'http' => [
+			'method' => $request_method,
+			'content' => $post_data,	
+			'header' => $headers,
+		]
+	];
+	$context = stream_context_create($opts);
+
+	$response = @file_get_contents($api_url, false, $context);
+	$response = json_decode($response, true);
+	printf_response($response);
+	fclose($fp);
+} while (1);
+
+function check_runtime_environment($argc) 
+{
+	if (stripos(PHP_SAPI, 'cli') !== 0) {
+		printl_err("Only run in cli mode!");
+		exit(1);
+	}
+	/**
+	if ($argc < 2) {
+		printl_err("Please entry a word!");
+		exit(1);
+	}
+	**/
+}
+
+function check_network_connection() 
+{
+	print_notice("Connection testing ...\n");
+	$ping_result = @fsockopen('aidemo.youdao.com', 80, $errno, $errstr, 3);
+	if ($ping_result === false) {
+		printl_err("Connection error: [%s]!", $errstr);
+		exit(1);
+	}
+	print_success("Test passed!\n");
+}
+
+function printf_response($response)
+{
+	if ($response['errorCode'] !== '0') {
+		//TODO
+	}
+	if (isset($response['translation'])) {
+		printl_success("Translation result          ");
+		foreach ($response['translation'] as $v) {
+			printl_notice("%s", $v);
+		}
+	}
+	if (isset($response['basic'])) {
+		printl_border(str_repeat('-', 50));
+		printl_success("Dictionary result");
+		if (isset($response['basic']['us-phonetic'])) {
+			print_notice("US:[%s]\t", $response['basic']['us-phonetic']);
+		}
+		if (isset($response['basic']['uk-phonetic'])) {
+			print_notice("UK:[%s]\t", $response['basic']['uk-phonetic']);
+		}
+		printf("\n");
+		if (isset($response['basic']['explains'])) {
+			foreach ($response['basic']['explains'] as $v) {
+				printl_notice("%s", $v);
+			}
+		}
+	}
+}
+
+function printl_err()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;31m" . $list[0] . "\033[0m\n";
+	call_user_func_array('printf', $list);
+}
+
+function printl_notice()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;33m" . $list[0] . "\033[0m\n";
+	call_user_func_array('printf', $list);
+}
+
+function printl_success()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;32m" . $list[0] . "\033[0m\n";
+	call_user_func_array('printf', $list);
+}
+
+function printl_border()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;36m" . $list[0] . "\033[0m\n";
+	call_user_func_array('printf', $list);
+}
+
+function print_err()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;31m" . $list[0] . "\033[0m";
+	call_user_func_array('printf', $list);
+}
+
+function print_notice()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;33m" . $list[0] . "\033[0m";
+	call_user_func_array('printf', $list);
+}
+
+function print_success()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;32m" . $list[0] . "\033[0m";
+	call_user_func_array('printf', $list);
+}
+
+function print_border()
+{
+	$list = func_get_args();
+	$list[0] = "\033[1;36m" . $list[0] . "\033[0m";
+	call_user_func_array('printf', $list);
+}
