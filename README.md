@@ -6,9 +6,9 @@ Use youdao api, so I can't promise you can use it everywhere especially overseas
 PHP(version >= 5.4)  
 
 # Install
-1.Copy the pdict file content  
-2.Sudo vim /usr/local/bin/pdict  
-3.Paste and exit with save  
+1.copy the "pdict" file content  
+2.  sudo vim /usr/local/bin/pdict  
+3.paste and exit with save  
   
 # Use
 Type pdict and knock enter and then you can query what you want
