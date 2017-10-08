@@ -7,7 +7,7 @@ PHP(version >= 5.4)
 
 # Install
 1.copy the "pdict" file content  
-2.  sudo vim /usr/local/bin/pdict  
+2.type "sudo vim /usr/local/bin/pdict"  
 3.paste and exit with save  
   
 # Use
